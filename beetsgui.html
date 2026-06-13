@@ -7,8 +7,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="BeetsGUI">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap');
+@font-face { font-family:'Gnomon Simple'; src:url('fonts/Gnomon-Simple.ttf') format('truetype'); }
+@font-face { font-family:'Gnomon Foreground'; src:url('fonts/Gnomon-Foreground.ttf') format('truetype'); }
+@font-face { font-family:'Drafting Mono'; src:url('fonts/DraftingMono-Regular.ttf') format('truetype'); font-weight:400; }
+@font-face { font-family:'Drafting Mono'; src:url('fonts/DraftingMono-Bold.ttf') format('truetype'); font-weight:700; }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
+    --gnomon-time: 12;
+    --font-mono: 'Drafting Mono', 'SF Mono', 'Menlo', monospace;
     --bg:#0f0f0f; --bg2:#1a1a1a; --bg3:#252525; --bg4:#2e2e2e;
     --text:#e8e6e1; --text2:#a09e99; --text3:#6a6866;
     --border:#2e2e2e; --border2:#3a3a3a;
@@ -27,11 +34,13 @@
       --red-bg:#fce8e8; --yellow-bg:#fdf5e0; --green-bg:#e8f4ec;
     }
   }
-  html,body { height:100%; background:var(--bg); color:var(--text); font-family:'SF Mono','Menlo',var(--font-mono); font-size:13px; line-height:1.6; }
+  html,body { height:100%; overflow-x:hidden; background:var(--bg); color:var(--text); font-family:'Jost', system-ui, sans-serif; font-size:13px; line-height:1.6; }
   .app { display:flex; flex-direction:column; height:100vh; max-width:860px; margin:0 auto; }
-  .app-header { display:flex; align-items:baseline; gap:0.75rem; padding:1rem 1.25rem 0; border-bottom:1px solid var(--border); flex-shrink:0; }
-  .app-title { font-size:15px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); }
-  .app-sub { font-size:11px; color:var(--text3); letter-spacing:0.04em; }
+  .app-header { display:flex; align-items:flex-start; gap:0.75rem; padding:1.2rem 1.25rem 0.9rem; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .app-title-wrap { position:relative; display:inline-block; line-height:1; }
+  .app-title-bg { font-family:'Gnomon Simple','Jost',sans-serif; font-size:30px; font-weight:400; letter-spacing:0.04em; color:var(--accent2); font-variation-settings:'TOTD' var(--gnomon-totd,500),'DIST' 400; display:block; }
+  .app-title-fg { font-family:'Gnomon Foreground','Jost',sans-serif; font-size:30px; font-weight:400; letter-spacing:0.04em; color:var(--accent); display:block; position:absolute; top:0; left:0; white-space:nowrap; }
+  .app-sub { font-size:12px; color:var(--text3); font-family:'Jost',sans-serif; font-weight:300; letter-spacing:0.03em; display:block; margin-top:0.2rem; }
   .lang-toggle { margin-left:auto; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius); color:var(--text2); cursor:pointer; font-family:inherit; font-size:11px; letter-spacing:0.06em; padding:0.25rem 0.6rem; transition:background 0.1s; }
   .lang-toggle:hover { background:var(--bg4); color:var(--text); }
   .tabs { display:flex; padding:0 1.25rem; border-bottom:1px solid var(--border); flex-shrink:0; overflow-x:auto; scrollbar-width:none; }
@@ -105,15 +114,35 @@
   .btn-run.running { background:var(--yellow-bg); border-color:var(--yellow); color:var(--yellow); }
   #output-content { max-height:200px; overflow-y:auto; }
   #output-content::-webkit-scrollbar { width:4px; } #output-content::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+  @property --splash-totd { syntax:'<number>'; inherits:false; initial-value:0; }
+  @keyframes gnomon-spin { from { --splash-totd:0 } to { --splash-totd:1000 } }
+  #splash { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; transition:opacity 0.6s; gap:1.5rem; }
+  #splash.fade { opacity:0; pointer-events:none; }
+  .splash-wrap { position:relative; display:inline-block; line-height:1; }
+  .splash-bg { font-family:'Gnomon Simple','Jost',sans-serif; font-size:52px; font-weight:400; letter-spacing:0.04em; color:var(--accent2); display:block; font-variation-settings:'TOTD' var(--splash-totd),'DIST' 450; animation:gnomon-spin 2.5s linear infinite; }
+  .splash-fg { font-family:'Gnomon Foreground','Jost',sans-serif; font-size:52px; font-weight:400; letter-spacing:0.04em; color:var(--accent); display:block; position:absolute; top:0; left:0; white-space:nowrap; }
+  .splash-sub { font-family:'Jost',sans-serif; font-size:12px; font-weight:300; color:var(--text3); letter-spacing:0.1em; text-transform:uppercase; }
 </style>
 </head>
 <body>
+<div id="splash">
+  <div class="splash-wrap">
+    <span class="splash-bg">BeetsGUI</span>
+    <span class="splash-fg">BeetsGUI</span>
+  </div>
+  <span class="splash-sub">beets music library</span>
+</div>
 <div class="app">
 
   <!-- Header -->
   <div class="app-header">
-    <span class="app-title">BeetsGUI</span>
-    <span class="app-sub" data-i18n="subtitle">beets musikbibliotek-assistent</span>
+    <div style="flex:1">
+      <div class="app-title-wrap">
+        <span class="app-title-bg">BeetsGUI</span>
+        <span class="app-title-fg">BeetsGUI</span>
+      </div>
+      <span class="app-sub" data-i18n="subtitle">beets musikbibliotek-assistent</span>
+    </div>
     <button class="lang-toggle" id="lang-btn" onclick="toggleLang()">EN</button>
   </div>
 
@@ -523,6 +552,46 @@
         <div class="alert alert-yellow" style="font-size:10px;" data-i18n="conv_wavtags_note">Brug "Importer med fromfilename" i Import-fanen efter konvertering.<br>Beets gætter metadata fra filnavnet (Artist - Titel.wav) og søger MusicBrainz.</div>
       </div>
 
+      <div class="section">
+        <div class="section-title" data-i18n="usb_title">USB Mirror</div>
+        <div class="alert alert-green" style="font-size:10px;margin-bottom:0.5rem;" data-i18n="usb_note">Spejler biblioteket til USB som MP3. Kør igen = kun nye tracks synkes.</div>
+        <div class="field">
+          <label data-i18n="usb_dest_label">Destination (USB-disk)</label>
+          <div class="field-row">
+            <input type="text" id="usb-dest" placeholder="/Volumes/USB" oninput="buildUsbCmd()">
+            <button class="btn btn-sm" onclick="promptUsbVolume()">Volumes/…</button>
+          </div>
+        </div>
+        <div class="field">
+          <label data-i18n="usb_format_label">Format</label>
+          <select id="usb-fmt" onchange="buildUsbCmd()" style="width:auto;">
+            <option value="mp3_320">MP3 320kbps</option>
+            <option value="mp3">MP3 VBR ~190</option>
+            <option value="aac">AAC 256kbps</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="usb_playlist_dir_label">Playliste-mappe</label>
+          <div class="field-row">
+            <input type="text" id="usb-pl-dir" placeholder="~/Playlister">
+            <button class="btn btn-sm" onclick="findPlaylists()" data-i18n="btn_find_playlists">Find playlister</button>
+          </div>
+        </div>
+        <div id="usb-pl-panel" style="display:none;margin-bottom:0.75rem;">
+          <div class="section-title" style="margin-bottom:0.4rem;" data-i18n="usb_playlists_title">Vælg playlister</div>
+          <div class="check-group" id="usb-pl-list"></div>
+          <label class="check-item" style="margin-top:0.5rem;">
+            <input type="checkbox" id="usb-all" onchange="toggleUsbAll(this)">
+            <span data-i18n="usb_all_label">Hele biblioteket (ingen filter)</span>
+          </label>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="buildUsbCmd(); runCmd()">▶ <span data-i18n="btn_sync_usb">Sync til USB</span></button>
+          <button class="btn" onclick="buildUsbCmd(true)" data-i18n="btn_usb_dryrun">Dry run</button>
+        </div>
+        <div class="alert alert-yellow" style="font-size:10px;margin-top:0.5rem;" data-i18n="usb_note2">Kræver <span class="mono">playlist</span>-plugin + <span class="mono">ffmpeg</span>. <span class="mono">mp3_320</span>-format inkluderes automatisk i genereret config.yaml.</div>
+      </div>
+
     </div><!-- /convert -->
 
     <!-- ═══ FIND ═══ -->
@@ -716,6 +785,7 @@
           <label class="check-item"><input type="checkbox" class="plugin" value="dirfields" onchange="buildConfig()"> dirfields</label>
           <label class="check-item"><input type="checkbox" class="plugin" value="scrub" onchange="buildConfig()"> scrub</label>
           <label class="check-item"><input type="checkbox" class="plugin" value="smartplaylist" onchange="buildConfig()"> smartplaylist</label>
+          <label class="check-item"><input type="checkbox" class="plugin" value="playlist" onchange="buildConfig()"> playlist</label>
           <label class="check-item"><input type="checkbox" class="plugin" value="unimported" onchange="buildConfig()"> unimported</label>
         </div>
       </div>
@@ -735,11 +805,17 @@
 
       <div class="section">
         <div class="section-title" data-i18n="settings_convert_title">Konverter ved import</div>
-        <div class="alert alert-yellow" style="font-size:10px; margin-bottom:0.5rem;" data-i18n="settings_convert_note">Kræver <span class="mono">brew install ffmpeg</span>. WAV, AIFF og FLAC konverteres til ALAC. MP3 og AAC forbliver uændret. ALAC re-encodes aldrig.</div>
-        <label class="check-item">
-          <input type="checkbox" id="cfg-convert-auto" onchange="buildConfig()">
-          <span data-i18n="settings_convert_toggle">Konverter lossless → ALAC ved import</span>
-        </label>
+        <div class="alert alert-yellow" style="font-size:10px; margin-bottom:0.5rem;" data-i18n="settings_convert_note">Kræver <span class="mono">brew install ffmpeg</span>. Lossless konverteres ved import. MP3 og AAC forbliver uændret.</div>
+        <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
+          <label class="check-item">
+            <input type="checkbox" id="cfg-convert-auto" onchange="buildConfig()">
+            <span data-i18n="settings_convert_toggle">Konverter lossless ved import til</span>
+          </label>
+          <select id="cfg-convert-fmt" onchange="buildConfig()" style="width:auto;">
+            <option value="alac">ALAC (macOS/Apple)</option>
+            <option value="flac">FLAC (universalt)</option>
+          </select>
+        </div>
       </div>
 
       <div class="section">
@@ -1044,6 +1120,17 @@ const LANG = {
     status_error: '✗ Fejl — server kørende?',
     status_saving: 'Gemmer…',
     status_no_server: '✗ Server ikke tilgængelig',
+    usb_title: 'USB Mirror',
+    usb_note: 'Spejler biblioteket til USB som MP3. Kør igen = kun nye tracks synkes.',
+    usb_dest_label: 'Destination (USB-disk)',
+    usb_format_label: 'Format',
+    usb_playlist_dir_label: 'Playliste-mappe',
+    btn_find_playlists: 'Find playlister',
+    usb_playlists_title: 'Vælg playlister',
+    usb_all_label: 'Hele biblioteket (ingen filter)',
+    btn_sync_usb: 'Sync til USB',
+    btn_usb_dryrun: 'Dry run',
+    usb_note2: 'Kræver playlist-plugin + ffmpeg. mp3_320 inkluderes automatisk i genereret config.yaml.',
   },
   en: {
     subtitle: 'beets music library assistant',
@@ -1179,6 +1266,17 @@ const LANG = {
     status_error: '✗ Error — server running?',
     status_saving: 'Saving…',
     status_no_server: '✗ Server not available',
+    usb_title: 'USB Mirror',
+    usb_note: 'Mirrors library to USB as MP3. Run again = only new tracks are synced.',
+    usb_dest_label: 'Destination (USB drive)',
+    usb_format_label: 'Format',
+    usb_playlist_dir_label: 'Playlist folder',
+    btn_find_playlists: 'Find playlists',
+    usb_playlists_title: 'Select playlists',
+    usb_all_label: 'Entire library (no filter)',
+    btn_sync_usb: 'Sync to USB',
+    btn_usb_dryrun: 'Dry run',
+    usb_note2: 'Requires playlist plugin + ffmpeg. mp3_320 format included automatically in generated config.yaml.',
   }
 }
 
@@ -1483,7 +1581,13 @@ function buildConfig() {
   if (plugins.includes('replaygain')) yaml += 'replaygain:\n  auto: yes\n  targetlevel: -18\n\n'
   if (plugins.includes('smartplaylist')) yaml += 'smartplaylist:\n  auto_save: yes\n  relative_to: ' + dir + '\n  playlist_dir: ~/Playlister/Smart/\n  playlists: []\n\n'
   if (document.getElementById('cfg-convert-auto') && document.getElementById('cfg-convert-auto').checked) {
-    yaml += 'convert:\n  auto: yes\n  format: alac\n  never_convert_lossy_files: yes\n  formats:\n    alac:\n      command: ffmpeg -i $source -codec:a alac -sample_fmt s32p -bits_per_raw_sample 24 $dest\n      extension: m4a\n\n'
+    const cfmt = document.getElementById('cfg-convert-fmt') ? document.getElementById('cfg-convert-fmt').value : 'alac'
+    yaml += 'convert:\n  auto: yes\n  format: ' + cfmt + '\n  never_convert_lossy_files: yes\n'
+    yaml += '  formats:\n    mp3_320:\n      command: ffmpeg -i $source -ab 320k -map_metadata 0 $dest\n      extension: mp3\n'
+    if (cfmt === 'alac') yaml += '    alac:\n      command: ffmpeg -i $source -codec:a alac -sample_fmt s32p -bits_per_raw_sample 24 $dest\n      extension: m4a\n'
+    yaml += '\n'
+  } else {
+    yaml += 'convert:\n  formats:\n    mp3_320:\n      command: ffmpeg -i $source -ab 320k -map_metadata 0 $dest\n      extension: mp3\n\n'
   }
 
   yaml += 'autotagger:\n  # Lower value = stricter matching\n  strong_rec_thresh: 0.04\n  # Use --timid flag to confirm only uncertain matches\n'
@@ -1623,6 +1727,57 @@ function toggleCmdPreview() {
   }
 }
 
+// ─── USB MIRROR ─────────────────────────────────────
+
+function buildUsbCmd(dryRun) {
+  const dest      = document.getElementById('usb-dest').value.trim() || '/Volumes/USB'
+  const fmt       = document.getElementById('usb-fmt') ? document.getElementById('usb-fmt').value : 'mp3_320'
+  const allTracks = document.getElementById('usb-all') && document.getElementById('usb-all').checked
+  const selected  = Array.from(document.querySelectorAll('.usb-pl:checked')).map(c => c.value)
+  const dry       = dryRun ? ' --pretend' : ''
+  const base      = 'beet convert --format ' + fmt + ' --dest "' + dest + '"' + dry
+
+  if (allTracks || selected.length === 0) {
+    setCmd(base)
+  } else if (selected.length === 1) {
+    setCmd(base + " 'playlist:" + selected[0] + "'")
+  } else {
+    setCmd(base + " '" + selected.map(p => 'playlist:' + p).join(' or ') + "'")
+  }
+}
+
+async function findPlaylists() {
+  const dir   = document.getElementById('usb-pl-dir').value.trim() || '~/Playlister'
+  const panel = document.getElementById('usb-pl-panel')
+  const list  = document.getElementById('usb-pl-list')
+  try {
+    const r = await fetch('/playlists?dir=' + encodeURIComponent(dir))
+    const d = await r.json()
+    if (d.ok && d.playlists.length > 0) {
+      list.innerHTML = d.playlists.map(p =>
+        '<label class="check-item"><input type="checkbox" class="usb-pl" value="' + p + '" onchange="buildUsbCmd()"> ' + p + '</label>'
+      ).join('')
+    } else {
+      list.innerHTML = '<span style="font-size:11px;color:var(--text3);">Ingen .m3u-filer fundet</span>'
+    }
+    panel.style.display = 'block'
+    buildUsbCmd()
+  } catch(e) {
+    list.innerHTML = '<span style="color:var(--red);font-size:11px;">✗ ' + t('status_no_server') + '</span>'
+    panel.style.display = 'block'
+  }
+}
+
+function toggleUsbAll(cb) {
+  document.querySelectorAll('.usb-pl').forEach(el => { el.checked = false })
+  buildUsbCmd()
+}
+
+function promptUsbVolume() {
+  const name = prompt(t('volume_prompt'))
+  if (name) { document.getElementById('usb-dest').value = '/Volumes/' + name; buildUsbCmd() }
+}
+
 // ─── KØR KOMMANDO ─────────────────────────────────
 let _stream = null
 
@@ -1683,6 +1838,25 @@ function closeOutput() {
 }
 
 // ─── Init ──────────────────────────────────────────
+// Splash: skyggen snurrer rundt, fade ud efter server er klar
+;(function splash() {
+  const el = document.getElementById('splash')
+  function tryFade() {
+    fetch('/status').then(r => r.json()).then(d => {
+      if (d.ok) { el.classList.add('fade'); setTimeout(() => el.remove(), 650) }
+      else setTimeout(tryFade, 400)
+    }).catch(() => setTimeout(tryFade, 400))
+  }
+  setTimeout(tryFade, 800) // giv fonte tid til at loade
+})()
+;(function updateGnomonTime() {
+  const now  = new Date()
+  const hour = now.getHours() + now.getMinutes() / 60
+  // TOTD-akse: 0 = 6:00, 1000 = 18:00
+  const totd = Math.max(0, Math.min(1000, (hour - 6) / 12 * 1000))
+  document.documentElement.style.setProperty('--gnomon-totd', Math.round(totd))
+  setTimeout(updateGnomonTime, 60000)
+})()
 applyLang()
 buildImportCmd()
 updatePathPreview()

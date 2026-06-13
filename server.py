@@ -137,6 +137,18 @@ def write_config():
 
 
 
+@app.route('/playlists')
+def list_playlists():
+    """Find .m3u-playlister i en mappe — bruges til USB Mirror."""
+    dir_path = os.path.expanduser(request.args.get('dir', '~/Playlister'))
+    try:
+        p = Path(dir_path)
+        playlists = sorted([f.stem for f in p.rglob('*.m3u') if not f.name.startswith('.')]) if p.exists() else []
+        return jsonify({'ok': True, 'playlists': playlists, 'dir': str(p)})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)})
+
+
 @app.route('/')
 def index():
     return send_from_directory(str(SCRIPT_DIR), HTML_FILE)
