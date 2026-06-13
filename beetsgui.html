@@ -608,7 +608,7 @@
         <div class="section-title" data-i18n="settings_editor_title">config.yaml</div>
         <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
           <span id="cfg-path" style="font-size:10px;color:var(--text3);font-family:var(--font-mono);flex:1;"></span>
-          <button class="btn btn-sm" onclick="loadBeetsConfig()">↺ Genindlæs</button>
+          <button class="btn btn-sm" onclick="loadBeetsConfig()" data-i18n="btn_reload">↺ Genindlæs</button>
         </div>
         <textarea id="cfg-editor" spellcheck="false" style="width:100%;height:260px;font-family:var(--font-mono);font-size:11px;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;resize:vertical;tab-size:2;box-sizing:border-box;"></textarea>
         <div style="display:flex;align-items:center;gap:0.75rem;margin-top:0.5rem;">
@@ -898,9 +898,9 @@
         <input type="text" class="cmd-field" id="cmd-display" readonly style="font-size:11px;padding:0.35rem 0.6rem;">
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;">
-        <button class="btn-run" id="run-btn" onclick="runCmd()">▶ Kør</button>
+        <button class="btn-run" id="run-btn" onclick="runCmd()" data-i18n="btn_run">▶ Kør</button>
         <button class="btn-copy" id="copy-btn" onclick="copyCmd()" data-i18n="btn_copy">Kopier</button>
-        <button class="btn btn-sm" id="cmd-toggle-btn" onclick="toggleCmdPreview()" style="border-color:transparent;color:var(--text3);">vis kommando</button>
+        <button class="btn btn-sm" id="cmd-toggle-btn" onclick="toggleCmdPreview()" style="border-color:transparent;color:var(--text3);" data-i18n="show_cmd">vis kommando</button>
       </div>
     </div>
   </div>
@@ -1035,6 +1035,15 @@ const LANG = {
     settings_editor_title: 'Rediger config.yaml',
     settings_editor_note: 'Backup gemmes automatisk som config.yaml.bak ved hver gemning.',
     btn_save_config: 'Gem config.yaml',
+    btn_run: '▶ Kør',
+    btn_stop: '⏹ Stop',
+    btn_reload: '↺ Genindlæs',
+    status_running: 'Kører…',
+    status_done: '✓ Færdig',
+    status_stopped: 'Stoppet',
+    status_error: '✗ Fejl — server kørende?',
+    status_saving: 'Gemmer…',
+    status_no_server: '✗ Server ikke tilgængelig',
   },
   en: {
     subtitle: 'beets music library assistant',
@@ -1161,6 +1170,15 @@ const LANG = {
     settings_editor_title: 'Edit config.yaml',
     settings_editor_note: 'A backup is saved automatically as config.yaml.bak on each save.',
     btn_save_config: 'Save config.yaml',
+    btn_run: '▶ Run',
+    btn_stop: '⏹ Stop',
+    btn_reload: '↺ Reload',
+    status_running: 'Running…',
+    status_done: '✓ Done',
+    status_stopped: 'Stopped',
+    status_error: '✗ Error — server running?',
+    status_saving: 'Saving…',
+    status_no_server: '✗ Server not available',
   }
 }
 
@@ -1549,14 +1567,14 @@ async function loadBeetsConfig() {
       status.textContent = '\u2717 ' + d.error
     }
   } catch(e) {
-    status.textContent = '\u2717 Server ikke tilg\u00e6ngelig'
+    status.textContent = t('status_no_server')
   }
 }
 
 async function saveBeetsConfig() {
   const content = document.getElementById('cfg-editor').value
   const status  = document.getElementById('cfg-save-status')
-  status.textContent = 'Gemmer\u2026'
+  status.textContent = t('status_saving')
   try {
     const r = await fetch('/config', {
       method: 'POST',
