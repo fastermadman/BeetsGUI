@@ -154,6 +154,11 @@ def index():
     return send_from_directory(str(SCRIPT_DIR), HTML_FILE)
 
 
+@app.route('/assets/<path:filename>')
+def serve_assets(filename):
+    return send_from_directory(str(SCRIPT_DIR / 'assets'), filename)
+
+
 @app.route('/status')
 def status():
     """Server-status, beet-sti og monterede volumes."""
